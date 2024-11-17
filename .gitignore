@@ -1,0 +1,8 @@
+# Ignore environment files
+.env
+
+# Node.js modules
+node_modules/
+
+# Logs
+*.log
