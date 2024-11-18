@@ -4,18 +4,35 @@ const passport = require("passport");
 const cors = require("cors");
 const mongoose = require("mongoose");
 const dotenv = require("dotenv");
+const path = require("path");
+
 const app = express();
 
 // import auth strategy
 require("./passportConfig");
 
-dotenv.config({ path: "./connect.env" });
+app.use(express.static(path.join(__dirname, "dist")));
+
+app.get("*", (req, res) => {
+  res.sendFile(path.resolve(__dirname, "dist", "index.html"));
+});
+
+dotenv.config();
 
 // Configure CORS FIRST
+// app.use(
+//   cors({
+//     origin: "http://localhost:5173", // React app's URL
+//     credentials: true, // Allow sending cookies
+//     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+//     allowedHeaders: ["Content-Type", "Authorization"],
+//   })
+// );
+
 app.use(
   cors({
-    origin: "http://localhost:5173", // React app's URL
-    credentials: true, // Allow sending cookies
+    origin: process.env.FRONTEND_URL || "*", // Update if needed for production
+    credentials: true, 
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
@@ -83,7 +100,7 @@ app.get(
   "/google/callback",
   passport.authenticate("google", {
     failureRedirect: "/auth/failure",
-    successRedirect: "http://localhost:5173/home",
+    successRedirect: process.env.FRONTEND_SUCCESS_URL || "http://localhost:5173/home",
   }),
   (req, res) => {
     console.log("User data after Google login:", req.user);
